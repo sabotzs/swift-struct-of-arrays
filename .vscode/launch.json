@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:swift-struct-of-arrays}",
+            "name": "Debug SwiftStructOfArraysClient",
+            "target": "SwiftStructOfArraysClient",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug SwiftStructOfArraysClient"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:swift-struct-of-arrays}",
+            "name": "Release SwiftStructOfArraysClient",
+            "target": "SwiftStructOfArraysClient",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release SwiftStructOfArraysClient"
+        }
+    ]
+}
