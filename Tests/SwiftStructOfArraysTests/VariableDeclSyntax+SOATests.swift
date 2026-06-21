@@ -56,3 +56,47 @@ final class VariableDeclSyntaxFlatBindingsTests: XCTestCase {
         XCTAssertEqual(flatDecls, expectedDecls)
     }
 }
+
+
+final class VariableDeclSyntaxToArrayTests: XCTestCase {
+    func testToArrayPreservesVarBinding() throws {
+        let decl = try VariableDeclSyntax("var index: Int")
+        let arrayType = decl.toArrayType()
+        let arrayTypeCode = "\(arrayType)"
+
+        let expectedDeclCode = "var index: [Int]"
+
+        XCTAssertEqual(arrayTypeCode, expectedDeclCode)
+    }
+
+    func testToArrayAlwaysGeneratesVarBinding() throws {
+        let decl = try VariableDeclSyntax("let index: Int")
+        let arrayType = decl.toArrayType()
+        let arrayTypeCode = "\(arrayType)"
+
+        let expectedDeclCode = "var index: [Int]"
+
+        XCTAssertEqual(arrayTypeCode, expectedDeclCode)
+    }
+
+    func testToArrayPreservesModifiers() throws {
+        let modifiers = [
+            "",
+            "static ",
+            "nonisolated ",
+            "private ",
+            "public ",
+            "internal ",
+            "fileprivate ",
+        ]
+        let codes = try modifiers.lazy
+            .map { $0 + "var index: Int" }
+            .map { try VariableDeclSyntax(SyntaxNodeString(stringLiteral: $0)) }
+            .map { $0.toArrayType() }
+            .map { "\($0)" }
+
+        let expected = modifiers.map { $0 + "var index: [Int]" }
+
+        XCTAssertEqual(Array(codes), expected)
+    }
+}

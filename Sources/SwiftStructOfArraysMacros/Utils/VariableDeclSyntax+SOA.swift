@@ -1,7 +1,7 @@
 import SwiftSyntax
 import SwiftSyntaxBuilder
 
-extension  VariableDeclSyntax {
+extension VariableDeclSyntax {
     func toFlatBindings() -> [VariableDeclSyntax] {
         let specifier: Keyword = self.bindingSpecifier.tokenKind == .keyword(.let) ? .let : .var
         var typelessIds: [IdentifierPatternSyntax] = []
@@ -27,5 +27,26 @@ extension  VariableDeclSyntax {
                 )
             }
         }
+    }
+
+    func toArrayType() -> VariableDeclSyntax {
+        guard bindings.count == 1 else {
+            fatalError("Expected VariableDeclSyntax with single variable.")
+        }
+
+        guard let identifier = self.bindings.first?.pattern.as(IdentifierPatternSyntax.self) else {
+            fatalError("Variable declaration does not have an identifier")
+        }
+
+        guard let type = bindings.first?.typeAnnotation?.type else {
+            fatalError("Variable declaration does not have a type annotation")
+        }
+
+        return VariableDeclSyntax(
+            modifiers: modifiers,
+            .var,
+            name: PatternSyntax(identifier).indented(by: .space, indentFirstLine: true),
+            type: TypeAnnotationSyntax(type: ArrayTypeSyntax(element: type).indented(by: .space, indentFirstLine: true))
+        )
     }
 }
