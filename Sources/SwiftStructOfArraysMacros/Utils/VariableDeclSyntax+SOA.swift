@@ -53,4 +53,16 @@ extension VariableDeclSyntax {
             type: TypeAnnotationSyntax(type: ArrayTypeSyntax(element: type).indented(by: .space, indentFirstLine: true))
         )
     }
+
+    var isStatic: Bool {
+        modifiers.first { $0.name.tokenKind == .keyword(.static) } != nil
+    }
+
+    var isAccessor: Bool {
+        guard bindings.count == 1 else {
+            fatalError("Expected VariableDeclSyntax with single variable.")
+        }
+
+        return bindings.first!.accessorBlock != nil
+    }
 }

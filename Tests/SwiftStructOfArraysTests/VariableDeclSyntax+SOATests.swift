@@ -57,7 +57,6 @@ final class VariableDeclSyntaxFlatBindingsTests: XCTestCase {
     }
 }
 
-
 final class VariableDeclSyntaxToArrayTests: XCTestCase {
     func testToArrayPreservesVarBinding() throws {
         let decl = try VariableDeclSyntax("var index: Int")
@@ -98,5 +97,48 @@ final class VariableDeclSyntaxToArrayTests: XCTestCase {
         let expected = modifiers.map { $0 + "var index: [Int]" }
 
         XCTAssertEqual(Array(codes), expected)
+    }
+}
+
+final class VariableDeclSyntaxIsStaticTests: XCTestCase {
+    func testStaticVariableReturnsTrue() throws {
+        let decl = try VariableDeclSyntax("static let number = 10")
+
+        XCTAssertTrue(decl.isStatic)
+    }
+
+    func testNonStaticVariableReturnsFalse() throws {
+        let decl = try VariableDeclSyntax("let number = 10")
+
+        XCTAssertFalse(decl.isStatic)
+    }
+}
+
+final class VariableDeclSyntaxIsAccessorTests: XCTestCase {
+    func testAccessorVariableReturnsTrue() throws {
+        let decl = try VariableDeclSyntax("""
+        var prop: Int {
+            get { _prop }
+            set { _prop = newValue }
+        }
+        """)
+
+        XCTAssertTrue(decl.isAccessor)
+    }
+
+    func testComputedPropertyReturnsTrue() throws {
+        let decl = try VariableDeclSyntax("""
+        var isAlive: Int {
+            health != 0
+        }
+        """)
+
+        XCTAssertTrue(decl.isAccessor)
+    }
+
+    func testSimpleVariableReturnsFalse() throws {
+        let decl = try VariableDeclSyntax("var prop: Int")
+
+        XCTAssertFalse(decl.isAccessor)
     }
 }
