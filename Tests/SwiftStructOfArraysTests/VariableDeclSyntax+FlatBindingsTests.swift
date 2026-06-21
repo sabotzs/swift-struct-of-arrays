@@ -45,12 +45,12 @@ final class VariableDeclSyntaxFlatBindingsTests: XCTestCase {
     }
 
     func testFlatBindingPreservesModifiers() throws {
-        let decl = try VariableDeclSyntax("private var index, position: Int")
+        let decl = try VariableDeclSyntax("private static var index, position: Int")
         let flatDecls = decl.toFlatBindings().map { "\($0)" }
 
         let expectedDecls = [
-            "private var index: Int",
-            "private var position: Int",
+            "private static var index: Int",
+            "private static var position: Int",
         ]
 
         XCTAssertEqual(flatDecls, expectedDecls)
