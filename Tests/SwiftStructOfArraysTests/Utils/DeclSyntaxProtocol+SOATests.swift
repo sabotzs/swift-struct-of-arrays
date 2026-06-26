@@ -107,3 +107,123 @@ final class DeclSyntaxProtocolGetVariableDeclsTests: XCTestCase {
         XCTAssertEqual(variableDecls, [])
     }
 }
+
+final class DeclSyntaxProtocolGetNestedTypeDecls: XCTestCase {
+    func testGetNestedTypeDeclsThrowsFromEnum() throws {
+        let enumDecl = try EnumDeclSyntax("enum Monster { }")
+
+        XCTAssertThrowsError(try enumDecl.getNestedTypeDecls())
+    }
+
+    func testGetNestedTypeDeclsThrowsFromActor() throws {
+        let actorDecl = try ActorDeclSyntax("actor Monster { }")
+
+        XCTAssertThrowsError(try actorDecl.getNestedTypeDecls())
+    }
+
+    func testGetNestedTypeDeclsFromClass() throws {
+        let classDecl = try ClassDeclSyntax("class Monster { }")
+
+        let variableDecls = try classDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+
+        XCTAssertEqual(variableDecls, [])
+    }
+
+    func testGetNestedTypeDeclsFromStruct() throws {
+        let structDecl = try StructDeclSyntax("struct Monster { }")
+
+        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+
+        XCTAssertEqual(variableDecls, [])
+    }
+
+    func testGetNestedTypeDeclsRecognizesActor() throws {
+        let structDecl = try StructDeclSyntax("""
+        struct Monster {
+            actor Health { }
+        }
+        """)
+        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+
+        let expectedDecls = [
+            "actor Health { }",
+        ]
+
+        XCTAssertEqual(variableDecls, expectedDecls)
+    }
+
+    func testGetNestedTypeDeclsRecognizesClass() throws {
+        let structDecl = try StructDeclSyntax("""
+        struct Monster {
+            class Health { }
+        }
+        """)
+        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+
+        let expectedDecls = [
+            "class Health { }",
+        ]
+
+        XCTAssertEqual(variableDecls, expectedDecls)
+    }
+
+    func testGetNestedTypeDeclsRecognizesEnum() throws {
+        let structDecl = try StructDeclSyntax("""
+        struct Monster {
+            enum Kind { }
+        }
+        """)
+        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+
+        let expectedDecls = [
+            "enum Kind { }",
+        ]
+
+        XCTAssertEqual(variableDecls, expectedDecls)
+    }
+
+    func testGetNestedTypeDeclsRecognizesProtocol() throws {
+        let structDecl = try StructDeclSyntax("""
+        struct Monster {
+            protocol Kind { }
+        }
+        """)
+        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+
+        let expectedDecls = [
+            "protocol Kind { }",
+        ]
+
+        XCTAssertEqual(variableDecls, expectedDecls)
+    }
+
+    func testGetNestedTypeDeclsRecognizesStruct() throws {
+        let structDecl = try StructDeclSyntax("""
+        struct Monster {
+            struct Kind { }
+        }
+        """)
+        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+
+        let expectedDecls = [
+            "struct Kind { }",
+        ]
+
+        XCTAssertEqual(variableDecls, expectedDecls)
+    }
+
+    func testGetNestedTypeDeclsRecognizesTypeAlias() throws {
+        let structDecl = try StructDeclSyntax("""
+        struct Monster {
+            typealias Health = Int
+        }
+        """)
+        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+
+        let expectedDecls = [
+            "typealias Health = Int",
+        ]
+
+        XCTAssertEqual(variableDecls, expectedDecls)
+    }
+}
