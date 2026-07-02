@@ -3,48 +3,7 @@ import SwiftSyntaxBuilder
 import XCTest
 @testable import SwiftStructOfArraysMacros
 
-final class DeclSyntaxProtocolGetVariableDeclsTests: XCTestCase {
-    func testGetVariableDeclsThrowsFromEnum() throws {
-        let enumDecl = try EnumDeclSyntax("""
-        enum MonsterKind {
-            case ogre
-            case satyr
-        }
-        """)
-
-        XCTAssertThrowsError(try enumDecl.getVariableDecls())
-    }
-
-    func testGetVariableDeclsThrowsFromActor() throws {
-        let actorDecl = try ActorDeclSyntax("""
-        actor Monster {
-            var health: Int = 100
-            var mana: Int = 100
-        }
-        """)
-
-        XCTAssertThrowsError(try actorDecl.getVariableDecls())
-    }
-
-    func testGetVariableDeclsFromClass() throws {
-        let structDecl = try ClassDeclSyntax("""
-        class Monster {
-            var health: Int = 100
-            var mana: Int = 100
-            var name: String = ""
-        }
-        """)
-        let variableDecls = try structDecl.getVariableDecls().map { "\($0.trimmed)" }
-
-        let expectedDecls = [
-            "var health: Int = 100",
-            "var mana: Int = 100",
-            "var name: String = \"\"",
-        ]
-
-        XCTAssertEqual(variableDecls, expectedDecls)
-    }
-
+final class StructDeclSyntaxGetVariableDeclsTests: XCTestCase {
     func testGetVariableDeclsFromStruct() throws {
         let structDecl = try StructDeclSyntax("""
         struct Monster {
@@ -53,7 +12,7 @@ final class DeclSyntaxProtocolGetVariableDeclsTests: XCTestCase {
             var name: String
         }
         """)
-        let variableDecls = try structDecl.getVariableDecls().map { "\($0.trimmed)" }
+        let variableDecls = structDecl.getVariableDecls().map { "\($0.trimmed)" }
 
         let expectedDecls = [
             "var health: Int",
@@ -70,7 +29,7 @@ final class DeclSyntaxProtocolGetVariableDeclsTests: XCTestCase {
             var image: Int { 3 }
         }
         """)
-        let variableDecls = try structDecl.getVariableDecls().map { "\($0.trimmed)" }
+        let variableDecls = structDecl.getVariableDecls().map { "\($0.trimmed)" }
 
         let expectedDecls = ["var image: Int { 3 }"]
 
@@ -85,7 +44,7 @@ final class DeclSyntaxProtocolGetVariableDeclsTests: XCTestCase {
             func fight() {}
         }
         """)
-        let variableDecls = try structDecl.getVariableDecls().map { "\($0.trimmed)" }
+        let variableDecls = structDecl.getVariableDecls().map { "\($0.trimmed)" }
 
         let expectedDecls = ["let index: Int"]
 
@@ -102,39 +61,19 @@ final class DeclSyntaxProtocolGetVariableDeclsTests: XCTestCase {
         }
         """)
 
-        let variableDecls = try structDecl.getVariableDecls().map { "\($0.trimmed)" }
+        let variableDecls = structDecl.getVariableDecls().map { "\($0.trimmed)" }
 
         XCTAssertEqual(variableDecls, [])
     }
 }
 
-final class DeclSyntaxProtocolGetNestedTypeDecls: XCTestCase {
-    func testGetNestedTypeDeclsThrowsFromEnum() throws {
-        let enumDecl = try EnumDeclSyntax("enum Monster { }")
-
-        XCTAssertThrowsError(try enumDecl.getNestedTypeDecls())
-    }
-
-    func testGetNestedTypeDeclsThrowsFromActor() throws {
-        let actorDecl = try ActorDeclSyntax("actor Monster { }")
-
-        XCTAssertThrowsError(try actorDecl.getNestedTypeDecls())
-    }
-
-    func testGetNestedTypeDeclsFromClass() throws {
-        let classDecl = try ClassDeclSyntax("class Monster { }")
-
-        let variableDecls = try classDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
-
-        XCTAssertEqual(variableDecls, [])
-    }
-
-    func testGetNestedTypeDeclsFromStruct() throws {
+final class StructDeclSyntaxGetNestedTypeDeclsTests: XCTestCase {
+    func testGetNestedTypeDeclsFromStructWithNoNestedTypes() throws {
         let structDecl = try StructDeclSyntax("struct Monster { }")
 
-        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+        let nestedTypeDecls = structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
 
-        XCTAssertEqual(variableDecls, [])
+        XCTAssertEqual(nestedTypeDecls, [])
     }
 
     func testGetNestedTypeDeclsRecognizesActor() throws {
@@ -143,7 +82,7 @@ final class DeclSyntaxProtocolGetNestedTypeDecls: XCTestCase {
             actor Health { }
         }
         """)
-        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+        let variableDecls = structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
 
         let expectedDecls = [
             "actor Health { }",
@@ -158,7 +97,7 @@ final class DeclSyntaxProtocolGetNestedTypeDecls: XCTestCase {
             class Health { }
         }
         """)
-        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+        let variableDecls = structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
 
         let expectedDecls = [
             "class Health { }",
@@ -173,7 +112,7 @@ final class DeclSyntaxProtocolGetNestedTypeDecls: XCTestCase {
             enum Kind { }
         }
         """)
-        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+        let variableDecls = structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
 
         let expectedDecls = [
             "enum Kind { }",
@@ -188,7 +127,7 @@ final class DeclSyntaxProtocolGetNestedTypeDecls: XCTestCase {
             protocol Kind { }
         }
         """)
-        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+        let variableDecls = structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
 
         let expectedDecls = [
             "protocol Kind { }",
@@ -203,7 +142,7 @@ final class DeclSyntaxProtocolGetNestedTypeDecls: XCTestCase {
             struct Kind { }
         }
         """)
-        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+        let variableDecls = structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
 
         let expectedDecls = [
             "struct Kind { }",
@@ -218,7 +157,7 @@ final class DeclSyntaxProtocolGetNestedTypeDecls: XCTestCase {
             typealias Health = Int
         }
         """)
-        let variableDecls = try structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
+        let variableDecls = structDecl.getNestedTypeDecls().map { "\($0.trimmed)" }
 
         let expectedDecls = [
             "typealias Health = Int",
