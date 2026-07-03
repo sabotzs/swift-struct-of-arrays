@@ -23,8 +23,8 @@ public struct SOAMacro: PeerMacro {
         }
 
         let variableDecls = structDecl.getVariableDecls().lazy
-            .filter { !($0.isStatic || $0.isAccessor) }
             .flatMap { $0.toFlatBindings() }
+            .filter { !($0.isStatic || $0.isAccessor) }
 
         let soaStructDecl = StructDeclSyntax(name: .identifier("\(structDecl.name.text)SOA")) {
             variableDecls.map { $0.toArrayType() }
