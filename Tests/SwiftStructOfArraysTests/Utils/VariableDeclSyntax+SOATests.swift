@@ -60,7 +60,7 @@ final class VariableDeclSyntaxFlatBindingsTests: XCTestCase {
 final class VariableDeclSyntaxToArrayTests: XCTestCase {
     func testToArrayPreservesVarBinding() throws {
         let decl = try VariableDeclSyntax("var index: Int")
-        let arrayType = decl.toArrayType()
+        let arrayType = addingProperSpaces(to: decl.toArrayType())
         let arrayTypeCode = "\(arrayType)"
 
         let expectedDeclCode = "var index: [Int]"
@@ -70,7 +70,7 @@ final class VariableDeclSyntaxToArrayTests: XCTestCase {
 
     func testToArrayAlwaysGeneratesVarBinding() throws {
         let decl = try VariableDeclSyntax("let index: Int")
-        let arrayType = decl.toArrayType()
+        let arrayType = addingProperSpaces(to: decl.toArrayType())
         let arrayTypeCode = "\(arrayType)"
 
         let expectedDeclCode = "var index: [Int]"
@@ -91,12 +91,19 @@ final class VariableDeclSyntaxToArrayTests: XCTestCase {
         let codes = try modifiers.lazy
             .map { $0 + "var index: Int" }
             .map { try VariableDeclSyntax(SyntaxNodeString(stringLiteral: $0)) }
-            .map { $0.toArrayType() }
+            .map { addingProperSpaces(to: $0.toArrayType()) }
             .map { "\($0)" }
 
         let expected = modifiers.map { $0 + "var index: [Int]" }
 
         XCTAssertEqual(Array(codes), expected)
+    }
+
+    private func addingProperSpaces(to declaration: VariableDeclSyntax) -> VariableDeclSyntax {
+        var decl = declaration
+        decl.bindings[decl.bindings.startIndex].pattern.leadingTrivia = .space
+        decl.bindings[decl.bindings.startIndex].typeAnnotation?.type.leadingTrivia = .space
+        return decl
     }
 }
 

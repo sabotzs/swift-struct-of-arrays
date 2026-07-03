@@ -49,8 +49,8 @@ extension VariableDeclSyntax {
         return VariableDeclSyntax(
             modifiers: modifiers,
             .var,
-            name: PatternSyntax(identifier).indented(by: .space, indentFirstLine: true),
-            type: TypeAnnotationSyntax(type: ArrayTypeSyntax(element: type).indented(by: .space, indentFirstLine: true))
+            name: PatternSyntax(identifier),
+            type: TypeAnnotationSyntax(type: ArrayTypeSyntax(element: type))
         )
     }
 
