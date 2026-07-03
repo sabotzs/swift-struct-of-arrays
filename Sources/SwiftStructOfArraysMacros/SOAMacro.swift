@@ -26,7 +26,7 @@ public struct SOAMacro: PeerMacro {
             .filter { !($0.isStatic || $0.isAccessor) }
             .flatMap { $0.toFlatBindings() }
 
-        let soaStructDecl = StructDeclSyntax(name: .identifier("MonsterSOA")) {
+        let soaStructDecl = StructDeclSyntax(name: .identifier("\(structDecl.name.text)SOA")) {
             variableDecls.map { $0.toArrayType() }
         }
 
