@@ -60,7 +60,7 @@ final class VariableDeclSyntaxFlatBindingsTests: XCTestCase {
 final class VariableDeclSyntaxToArrayTests: XCTestCase {
     func testToArrayPreservesVarBinding() throws {
         let decl = try VariableDeclSyntax("var index: Int")
-        let arrayType = addingProperSpaces(to: decl.toArrayType())
+        let arrayType = decl.toArrayType().withTestTrivia
         let arrayTypeCode = "\(arrayType)"
 
         let expectedDeclCode = "var index: [Int]"
@@ -70,7 +70,7 @@ final class VariableDeclSyntaxToArrayTests: XCTestCase {
 
     func testToArrayAlwaysGeneratesVarBinding() throws {
         let decl = try VariableDeclSyntax("let index: Int")
-        let arrayType = addingProperSpaces(to: decl.toArrayType())
+        let arrayType = decl.toArrayType().withTestTrivia
         let arrayTypeCode = "\(arrayType)"
 
         let expectedDeclCode = "var index: [Int]"
@@ -91,19 +91,12 @@ final class VariableDeclSyntaxToArrayTests: XCTestCase {
         let codes = try modifiers.lazy
             .map { $0 + "var index: Int" }
             .map { try VariableDeclSyntax(SyntaxNodeString(stringLiteral: $0)) }
-            .map { addingProperSpaces(to: $0.toArrayType()) }
+            .map { $0.toArrayType().withTestTrivia }
             .map { "\($0)" }
 
         let expected = modifiers.map { $0 + "var index: [Int]" }
 
         XCTAssertEqual(Array(codes), expected)
-    }
-
-    private func addingProperSpaces(to declaration: VariableDeclSyntax) -> VariableDeclSyntax {
-        var decl = declaration
-        decl.bindings[decl.bindings.startIndex].pattern.leadingTrivia = .space
-        decl.bindings[decl.bindings.startIndex].typeAnnotation?.type.leadingTrivia = .space
-        return decl
     }
 }
 
@@ -147,5 +140,27 @@ final class VariableDeclSyntaxIsAccessorTests: XCTestCase {
         let decl = try VariableDeclSyntax("var prop: Int")
 
         XCTAssertFalse(decl.isAccessor)
+    }
+}
+
+final class VariableDeclSyntaxToFullTypeTests: XCTestCase {
+    func testSimpleType() throws {
+        let baseType = IdentifierTypeSyntax(name: .identifier("Monster"))
+        let decl = try VariableDeclSyntax("var kind: Kind")
+        let fullType = decl.toFullType(base: baseType).withTestTrivia
+        let result = "\(fullType)"
+
+        let expectedDecl = "var kind: Monster.Kind"
+
+        XCTAssertEqual(result, expectedDecl)
+    }
+}
+
+private extension VariableDeclSyntax {
+    var withTestTrivia: VariableDeclSyntax {
+        var decl = self
+        decl.bindings[bindings.startIndex].pattern.leadingTrivia = .space
+        decl.bindings[bindings.startIndex].typeAnnotation?.type.leadingTrivia = .space
+        return decl
     }
 }
