@@ -22,9 +22,13 @@ public struct SOAMacro: PeerMacro {
             throw .notStruct
         }
 
+        let nestedTypeIdentifiers = structDecl.getNestedTypeDecls()
+            .map { $0.typeIdentifier }
+
         let variableDecls = structDecl.getVariableDecls().lazy
             .flatMap { $0.toFlatBindings() }
             .filter { !($0.isStatic || $0.isAccessor) }
+            .map { $0.toFullType(baseTypeId: structDecl.name.text, nestedTypeIds: nestedTypeIdentifiers) }
 
         let soaStructDecl = StructDeclSyntax(name: .identifier("\(structDecl.name.text)SOA")) {
             variableDecls.map { $0.toArrayType() }

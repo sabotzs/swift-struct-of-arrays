@@ -13,7 +13,7 @@ let testMacros: [String: Macro.Type] = [
 #endif
 
 final class SOAMacroTests: XCTestCase {
-    func testSOAMacroOnStructWithSeparateVariableDecls() throws {
+    func testSOAMacroWithSeparateVariableDecls() throws {
         #if canImport(SwiftStructOfArraysMacros)
         assertMacroExpansion(
             """
@@ -42,7 +42,7 @@ final class SOAMacroTests: XCTestCase {
         #endif
     }
 
-    func testSOAMacroOnStructWithMultipleVariableDeclsWithSameTypeInSingleLine() throws {
+    func testSOAMacroWithMultipleVariableDeclsWithSameTypeInSingleLine() throws {
         #if canImport(SwiftStructOfArraysMacros)
         assertMacroExpansion(
             """
@@ -68,7 +68,7 @@ final class SOAMacroTests: XCTestCase {
         #endif
     }
 
-    func testSOAMacroOnStructWithMultipleVariableDeclsWithDifferentTypesInSingleLine() throws {
+    func testSOAMacroWithMultipleVariableDeclsWithDifferentTypesInSingleLine() throws {
         #if canImport(SwiftStructOfArraysMacros)
         assertMacroExpansion(
             """
@@ -85,6 +85,41 @@ final class SOAMacroTests: XCTestCase {
             struct MonsterSOA {
                 var health: [Int]
                 var isAlive: [Bool]
+            }
+            """,
+            macros: testMacros
+        )
+        #else
+        throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
+    func testSOAMacroWithNestedType() throws {
+        #if canImport(SwiftStructOfArraysMacros)
+        assertMacroExpansion(
+            """
+            @SOA
+            struct Monster {
+                var kind: Kind
+
+                enum Kind {
+                    case ogre
+                    case troll
+                }
+            }
+            """,
+            expandedSource: """
+            struct Monster {
+                var kind: Kind
+
+                enum Kind {
+                    case ogre
+                    case troll
+                }
+            }
+
+            struct MonsterSOA {
+                var kind: [Monster.Kind]
             }
             """,
             macros: testMacros
