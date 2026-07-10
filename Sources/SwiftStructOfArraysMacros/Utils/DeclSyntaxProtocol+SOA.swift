@@ -2,18 +2,15 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 
 extension DeclSyntaxProtocol {
-    private var typeDeclTypes: [DeclSyntaxProtocol.Type] {
-        [
-            ActorDeclSyntax.self,
-            ClassDeclSyntax.self,
-            EnumDeclSyntax.self,
-            ProtocolDeclSyntax.self,
-            StructDeclSyntax.self,
-            TypeAliasDeclSyntax.self,
-        ]
+    var isTypeDecl: Bool {
+        self is TypeDeclSyntaxProtocol
     }
 
-    var isTypeDecl: Bool {
-        typeDeclTypes.contains { type in self.is(type) }
+    var typeIdentifier: String {
+        guard let typeDecl = self as? TypeDeclSyntaxProtocol else {
+            preconditionFailure("DeclSyntaxProtocol is not a type declaration: \(self)")
+        }
+
+        return typeDecl.name.text
     }
 }
