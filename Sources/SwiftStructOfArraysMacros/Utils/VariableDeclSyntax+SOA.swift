@@ -46,7 +46,7 @@ extension VariableDeclSyntax {
             fatalError("Variable declaration does not have a type annotation")
         }
 
-        guard nestedTypeIds.contains("\(type)") else {
+        guard nestedTypeIds.contains(where: { "\(type)".hasPrefix($0) }) else {
             return self
         }
 

@@ -101,25 +101,40 @@ final class SOAMacroTests: XCTestCase {
             @SOA
             struct Monster {
                 var kind: Kind
+                var longitude: Position.Longitude
 
                 enum Kind {
                     case ogre
                     case troll
+                }
+
+                struct Position {
+                    struct Longitude {
+                        var degrees: Int
+                    }
                 }
             }
             """,
             expandedSource: """
             struct Monster {
                 var kind: Kind
+                var longitude: Position.Longitude
 
                 enum Kind {
                     case ogre
                     case troll
                 }
+
+                struct Position {
+                    struct Longitude {
+                        var degrees: Int
+                    }
+                }
             }
 
             struct MonsterSOA {
                 var kind: [Monster.Kind]
+                var longitude: [Monster.Position.Longitude]
             }
             """,
             macros: testMacros

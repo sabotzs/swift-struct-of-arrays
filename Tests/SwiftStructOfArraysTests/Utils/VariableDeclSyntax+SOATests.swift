@@ -163,6 +163,16 @@ final class VariableDeclSyntaxToFullTypeTests: XCTestCase {
 
         XCTAssertEqual(result, expectedDecl)
     }
+
+    func testTypeWithMoreThanOneLevelOfNesting() throws {
+        let decl = try VariableDeclSyntax("var longitude: Position.Longitude")
+        let fullType = decl.toFullType(baseTypeId: "Monster", nestedTypeIds: ["Position"]).withTestTrivia
+        let result = "\(fullType)"
+
+        let expectedDecl = "var longitude: Monster.Position.Longitude"
+
+        XCTAssertEqual(result, expectedDecl)
+    }
 }
 
 private extension VariableDeclSyntax {
