@@ -33,7 +33,7 @@ extension VariableDeclSyntax {
         }
     }
 
-    func toFullType(base: IdentifierTypeSyntax) -> VariableDeclSyntax {
+    func toFullType(baseTypeId: String, nestedTypeIds: [String]) -> VariableDeclSyntax {
         guard bindings.count == 1 else {
             fatalError("Expected VariableDeclSyntax with single variable.")
         }
@@ -46,11 +46,19 @@ extension VariableDeclSyntax {
             fatalError("Variable declaration does not have a type annotation")
         }
 
+        guard nestedTypeIds.contains("\(type)") else {
+            return self
+        }
+
+        let fullType = MemberTypeSyntax(
+            baseType: IdentifierTypeSyntax(name: .identifier(baseTypeId)),
+            name: .identifier("\(type)"))
+
         return VariableDeclSyntax(
             modifiers: modifiers,
             .var,
             name: PatternSyntax(identifier),
-            type: TypeAnnotationSyntax(type: MemberTypeSyntax(baseType: base, name: .identifier("\(type)")))
+            type: TypeAnnotationSyntax(type: fullType)
         )
     }
 

@@ -144,13 +144,22 @@ final class VariableDeclSyntaxIsAccessorTests: XCTestCase {
 }
 
 final class VariableDeclSyntaxToFullTypeTests: XCTestCase {
-    func testSimpleType() throws {
-        let baseType = IdentifierTypeSyntax(name: .identifier("Monster"))
+    func testTypeContainedInBaseType() throws {
         let decl = try VariableDeclSyntax("var kind: Kind")
-        let fullType = decl.toFullType(base: baseType).withTestTrivia
+        let fullType = decl.toFullType(baseTypeId: "Monster", nestedTypeIds: ["Kind"]).withTestTrivia
         let result = "\(fullType)"
 
         let expectedDecl = "var kind: Monster.Kind"
+
+        XCTAssertEqual(result, expectedDecl)
+    }
+
+    func testTypeNotContainedInBaseType() throws {
+        let decl = try VariableDeclSyntax("var kind: Kind")
+        let fullType = decl.toFullType(baseTypeId: "Monster", nestedTypeIds: [])
+        let result = "\(fullType)"
+
+        let expectedDecl = "var kind: Kind"
 
         XCTAssertEqual(result, expectedDecl)
     }
