@@ -32,6 +32,15 @@ final class SOAMacroTests: XCTestCase {
             struct MonsterSOA {
                 var health: [Int]
                 var isAlive: [Bool]
+
+                init(_ sequence: some Sequence<Monster>) {
+                    self.health = sequence.map {
+                        $0.health
+                    }
+                    self.isAlive = sequence.map {
+                        $0.isAlive
+                    }
+                }
             }
             """,
             macros: testMacros
@@ -59,6 +68,15 @@ final class SOAMacroTests: XCTestCase {
             struct MonsterSOA {
                 var health: [Int]
                 var mana: [Int]
+
+                init(_ sequence: some Sequence<Monster>) {
+                    self.health = sequence.map {
+                        $0.health
+                    }
+                    self.mana = sequence.map {
+                        $0.mana
+                    }
+                }
             }
             """,
             macros: testMacros
@@ -85,6 +103,15 @@ final class SOAMacroTests: XCTestCase {
             struct MonsterSOA {
                 var health: [Int]
                 var isAlive: [Bool]
+
+                init(_ sequence: some Sequence<Monster>) {
+                    self.health = sequence.map {
+                        $0.health
+                    }
+                    self.isAlive = sequence.map {
+                        $0.isAlive
+                    }
+                }
             }
             """,
             macros: testMacros
@@ -135,6 +162,15 @@ final class SOAMacroTests: XCTestCase {
             struct MonsterSOA {
                 var kind: [Monster.Kind]
                 var longitude: [Monster.Position.Longitude]
+
+                init(_ sequence: some Sequence<Monster>) {
+                    self.kind = sequence.map {
+                        $0.kind
+                    }
+                    self.longitude = sequence.map {
+                        $0.longitude
+                    }
+                }
             }
             """,
             macros: testMacros

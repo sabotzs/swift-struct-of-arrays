@@ -94,4 +94,11 @@ extension VariableDeclSyntax {
 
         return bindings.first!.accessorBlock != nil
     }
+
+    var nameIdentifier: String {
+        guard bindings.count == 1, let identifier = bindings.first?.pattern.as(IdentifierPatternSyntax.self) else {
+            fatalError("Expected VariableDeclSyntax with single variable and an identifier pattern.")
+        }
+        return identifier.identifier.text
+    }
 }
