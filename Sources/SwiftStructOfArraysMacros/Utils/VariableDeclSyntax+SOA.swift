@@ -101,4 +101,11 @@ extension VariableDeclSyntax {
         }
         return identifier.identifier.text
     }
+
+    var selfDeclReferenceExpr: MemberAccessExprSyntax {
+        MemberAccessExprSyntax(
+            base: DeclReferenceExprSyntax(baseName: .keyword(.self)),
+            declName: DeclReferenceExprSyntax(baseName: .identifier(nameIdentifier))
+        )
+    }
 }

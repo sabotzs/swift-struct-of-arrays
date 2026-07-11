@@ -41,6 +41,11 @@ final class SOAMacroTests: XCTestCase {
                         $0.isAlive
                     }
                 }
+
+                init(repeating monster: Monster, count: Int) {
+                    self.health = Array(repeating: monster.health, count: count)
+                    self.isAlive = Array(repeating: monster.isAlive, count: count)
+                }
             }
             """,
             macros: testMacros
@@ -77,6 +82,11 @@ final class SOAMacroTests: XCTestCase {
                         $0.mana
                     }
                 }
+
+                init(repeating monster: Monster, count: Int) {
+                    self.health = Array(repeating: monster.health, count: count)
+                    self.mana = Array(repeating: monster.mana, count: count)
+                }
             }
             """,
             macros: testMacros
@@ -111,6 +121,11 @@ final class SOAMacroTests: XCTestCase {
                     self.isAlive = sequence.map {
                         $0.isAlive
                     }
+                }
+
+                init(repeating monster: Monster, count: Int) {
+                    self.health = Array(repeating: monster.health, count: count)
+                    self.isAlive = Array(repeating: monster.isAlive, count: count)
                 }
             }
             """,
@@ -170,6 +185,11 @@ final class SOAMacroTests: XCTestCase {
                     self.longitude = sequence.map {
                         $0.longitude
                     }
+                }
+
+                init(repeating monster: Monster, count: Int) {
+                    self.kind = Array(repeating: monster.kind, count: count)
+                    self.longitude = Array(repeating: monster.longitude, count: count)
                 }
             }
             """,

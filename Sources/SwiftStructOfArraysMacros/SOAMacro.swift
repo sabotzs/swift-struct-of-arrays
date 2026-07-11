@@ -43,10 +43,10 @@ public struct SOAMacro: PeerMacro {
         for structDecl: StructDeclSyntax,
         variableDecls: some Sequence<VariableDeclSyntax>
     ) -> [DeclSyntax] {
-        let initDecls = [
+        return [
             generateSequenceInitDecl(for: structDecl, variableDecls: variableDecls),
+            generateRepeatingInitDecl(for: structDecl, variableDecls: variableDecls),
         ]
-        return initDecls.compactMap { $0 }
     }
 
     private static func generateSequenceInitDecl(
@@ -76,10 +76,7 @@ public struct SOAMacro: PeerMacro {
         let codeBlock = CodeBlockSyntax {
             variableDecls.map { variableDecl in
                 let expr = InfixOperatorExprSyntax(
-                    leftOperand: MemberAccessExprSyntax(
-                        base: DeclReferenceExprSyntax(baseName: .keyword(.self)),
-                        declName: DeclReferenceExprSyntax(baseName: .identifier(variableDecl.nameIdentifier))
-                    ),
+                    leftOperand: variableDecl.selfDeclReferenceExpr,
                     operator: AssignmentExprSyntax(),
                     rightOperand: FunctionCallExprSyntax(
                         calledExpression: MemberAccessExprSyntax(
@@ -101,6 +98,63 @@ public struct SOAMacro: PeerMacro {
                 return CodeBlockItemSyntax(item: .expr(ExprSyntax(expr)))
             }
         }
+        return DeclSyntax(
+            InitializerDeclSyntax(
+                leadingTrivia: .newlines(2),
+                signature: signature,
+                body: codeBlock
+            )
+        )
+    }
+
+    private static func generateRepeatingInitDecl(
+        for structDecl: StructDeclSyntax,
+        variableDecls: some Sequence<VariableDeclSyntax>
+    ) -> DeclSyntax {
+        let signature = FunctionSignatureSyntax(
+            parameterClause: FunctionParameterClauseSyntax {
+                FunctionParameterSyntax(
+                    firstName: .identifier("repeating"),
+                    secondName: .identifier(structDecl.name.text.lowercased()),
+                    type: TypeSyntax(IdentifierTypeSyntax(name: .identifier(structDecl.name.text)))
+                )
+                FunctionParameterSyntax(
+                    firstName: .identifier("count"),
+                    type: TypeSyntax(IdentifierTypeSyntax(name: .identifier("Int")))
+                )
+            }
+        )
+
+        let codeBlock = CodeBlockSyntax {
+            variableDecls.map { variableDecl in
+                let expr = InfixOperatorExprSyntax(
+                    leftOperand: variableDecl.selfDeclReferenceExpr,
+                    operator: AssignmentExprSyntax(),
+                    rightOperand: FunctionCallExprSyntax(
+                        calledExpression: DeclReferenceExprSyntax(baseName: .identifier("Array")),
+                        leftParen: .leftParenToken(),
+                        arguments: LabeledExprListSyntax {
+                            LabeledExprSyntax(
+                                label: .identifier("repeating"),
+                                colon: .colonToken(),
+                                expression: MemberAccessExprSyntax(
+                                    base: DeclReferenceExprSyntax(baseName: .identifier(structDecl.name.text.lowercased())),
+                                    declName: DeclReferenceExprSyntax(baseName: .identifier(variableDecl.nameIdentifier))
+                                )
+                            )
+                            LabeledExprSyntax(
+                                label: .identifier("count"),
+                                colon: .colonToken(),
+                                expression: DeclReferenceExprSyntax(baseName: .identifier("count"))
+                            )
+                        },
+                        rightParen: .rightParenToken()
+                    )
+                )
+                return CodeBlockItemSyntax(item: .expr(ExprSyntax(expr)))
+            }
+        }
+
         return DeclSyntax(
             InitializerDeclSyntax(
                 leadingTrivia: .newlines(2),
