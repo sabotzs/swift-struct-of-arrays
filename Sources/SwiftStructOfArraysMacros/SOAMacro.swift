@@ -32,8 +32,8 @@ public struct SOAMacro: PeerMacro {
 
         let soaStructDecl = StructDeclSyntax(name: .identifier("\(structDecl.name.text)SOA")) {
             variableDecls.map { $0.toArrayType() }
-
             generateInitDecls(for: structDecl, variableDecls: variableDecls)
+            generateCollectionConformanceDecls(for: structDecl, variableDecls: variableDecls)
         }
 
         return [DeclSyntax(soaStructDecl)]
@@ -162,5 +162,33 @@ public struct SOAMacro: PeerMacro {
                 body: codeBlock
             )
         )
+    }
+
+    private static func generateCollectionConformanceDecls(
+        for structDecl: StructDeclSyntax,
+        variableDecls: some Sequence<VariableDeclSyntax>
+    ) -> [DeclSyntax] {
+        return [
+            generateStartIndex(),
+        ]
+    }
+
+    private static func generateStartIndex() -> DeclSyntax {
+        let codeBlock = CodeBlockItemListSyntax {
+            CodeBlockItemSyntax(item: .expr(ExprSyntax(IntegerLiteralExprSyntax(integerLiteral: 0))))
+        }
+
+        let decl = VariableDeclSyntax(
+            leadingTrivia: .newlines(2),
+            bindingSpecifier: .keyword(.var)
+        ) {
+            PatternBindingSyntax(
+                pattern: IdentifierPatternSyntax(identifier: .identifier("startIndex")),
+                typeAnnotation: TypeAnnotationSyntax(type: TypeSyntax(IdentifierTypeSyntax(name: .identifier("Int")))),
+                accessorBlock: AccessorBlockSyntax(accessors: .getter(codeBlock))
+            )
+        }
+
+        return DeclSyntax(decl)
     }
 }
