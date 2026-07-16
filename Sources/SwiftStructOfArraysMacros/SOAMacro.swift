@@ -173,6 +173,7 @@ public struct SOAMacro: PeerMacro {
         return [
             generateStartIndex(),
             try generateEndIndex(variableDecls: variableDecls),
+            generateIndexAfter(),
         ]
     }
 
@@ -221,6 +222,32 @@ public struct SOAMacro: PeerMacro {
             )
         }
 
+        return DeclSyntax(decl)
+    }
+
+    private static func generateIndexAfter() -> DeclSyntax {
+        let decl = FunctionDeclSyntax(
+            leadingTrivia: .newlines(2),
+            name: .identifier("index"),
+            signature: FunctionSignatureSyntax(
+                parameterClause: FunctionParameterClauseSyntax {
+                    FunctionParameterSyntax(
+                        firstName: .identifier("after"),
+                        secondName: .identifier("i"),
+                        type: TypeSyntax(IdentifierTypeSyntax(name: .identifier("Int")))
+                    )
+                },
+                returnClause: ReturnClauseSyntax(type: TypeSyntax(IdentifierTypeSyntax(name: .identifier("Int"))))
+            ),
+            body: CodeBlockSyntax {
+                let expr = InfixOperatorExprSyntax(
+                    leftOperand: DeclReferenceExprSyntax(baseName: .identifier("i")),
+                    operator: BinaryOperatorExprSyntax(operator: .binaryOperator("+")),
+                    rightOperand: IntegerLiteralExprSyntax(integerLiteral: 1)
+                )
+                CodeBlockItemSyntax(item: .expr(ExprSyntax(expr)))
+            }
+        )
         return DeclSyntax(decl)
     }
 }

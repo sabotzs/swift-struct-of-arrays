@@ -54,6 +54,10 @@ final class SOAMacroTests: XCTestCase {
                 var endIndex: Int {
                     health.count
                 }
+
+                func index(after i: Int) -> Int {
+                    i + 1
+                }
             }
             """,
             macros: testMacros
@@ -103,6 +107,10 @@ final class SOAMacroTests: XCTestCase {
                 var endIndex: Int {
                     health.count
                 }
+
+                func index(after i: Int) -> Int {
+                    i + 1
+                }
             }
             """,
             macros: testMacros
@@ -150,6 +158,10 @@ final class SOAMacroTests: XCTestCase {
 
                 var endIndex: Int {
                     health.count
+                }
+
+                func index(after i: Int) -> Int {
+                    i + 1
                 }
             }
             """,
@@ -222,6 +234,10 @@ final class SOAMacroTests: XCTestCase {
 
                 var endIndex: Int {
                     kind.count
+                }
+
+                func index(after i: Int) -> Int {
+                    i + 1
                 }
             }
             """,
