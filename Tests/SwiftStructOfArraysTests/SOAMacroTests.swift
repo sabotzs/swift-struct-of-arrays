@@ -58,6 +58,16 @@ final class SOAMacroTests: XCTestCase {
                 func index(after i: Int) -> Int {
                     i + 1
                 }
+
+                subscript(index: Int) -> Monster {
+                    get {
+                        Monster(health: health[index], isAlive: isAlive[index])
+                    }
+                    set(monster) {
+                        health[index] = monster.health
+                        isAlive[index] = monster.isAlive
+                    }
+                }
             }
             """,
             macros: testMacros
@@ -111,6 +121,16 @@ final class SOAMacroTests: XCTestCase {
                 func index(after i: Int) -> Int {
                     i + 1
                 }
+
+                subscript(index: Int) -> Monster {
+                    get {
+                        Monster(health: health[index], mana: mana[index])
+                    }
+                    set(monster) {
+                        health[index] = monster.health
+                        mana[index] = monster.mana
+                    }
+                }
             }
             """,
             macros: testMacros
@@ -162,6 +182,16 @@ final class SOAMacroTests: XCTestCase {
 
                 func index(after i: Int) -> Int {
                     i + 1
+                }
+
+                subscript(index: Int) -> Monster {
+                    get {
+                        Monster(health: health[index], isAlive: isAlive[index])
+                    }
+                    set(monster) {
+                        health[index] = monster.health
+                        isAlive[index] = monster.isAlive
+                    }
                 }
             }
             """,
@@ -238,6 +268,16 @@ final class SOAMacroTests: XCTestCase {
 
                 func index(after i: Int) -> Int {
                     i + 1
+                }
+
+                subscript(index: Int) -> Monster {
+                    get {
+                        Monster(kind: kind[index], longitude: longitude[index])
+                    }
+                    set(monster) {
+                        kind[index] = monster.kind
+                        longitude[index] = monster.longitude
+                    }
                 }
             }
             """,

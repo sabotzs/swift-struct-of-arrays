@@ -174,6 +174,7 @@ public struct SOAMacro: PeerMacro {
             generateStartIndex(),
             try generateEndIndex(variableDecls: variableDecls),
             generateIndexAfter(),
+            generateSubscript(for: structDecl, variableDecls: variableDecls),
         ]
     }
 
@@ -249,5 +250,89 @@ public struct SOAMacro: PeerMacro {
             }
         )
         return DeclSyntax(decl)
+    }
+
+    private static func generateSubscript(
+        for structDecl: StructDeclSyntax,
+        variableDecls: some Sequence<VariableDeclSyntax>
+    ) -> DeclSyntax {
+        let decl = SubscriptDeclSyntax(
+            leadingTrivia: .newlines(2),
+            parameterClause: FunctionParameterClauseSyntax {
+                FunctionParameterSyntax(
+                    firstName: .identifier("index"),
+                    type: TypeSyntax(IdentifierTypeSyntax(name: .identifier("Int")))
+                )
+            },
+            returnClause: ReturnClauseSyntax(type: IdentifierTypeSyntax(name: .identifier(structDecl.name.text))),
+            accessorBlock: AccessorBlockSyntax(accessors: .accessors(AccessorDeclListSyntax {
+                generateSubscriptGetAccessor(for: structDecl, variableDecls: variableDecls)
+                generateSubscriptSetAccessor(for: structDecl, variableDecls: variableDecls)
+            }))
+        )
+        return DeclSyntax(decl)
+    }
+
+    private static func generateSubscriptGetAccessor(
+        for structDecl: StructDeclSyntax,
+        variableDecls: some Sequence<VariableDeclSyntax>
+    ) -> AccessorDeclSyntax {
+        let index = DeclReferenceExprSyntax(baseName: .identifier("index"))
+        let arguments = LabeledExprListSyntax {
+            variableDecls.map { variableDecl in
+                let variableDeclIdentifier = TokenSyntax.identifier(variableDecl.nameIdentifier)
+                let calledExpr = DeclReferenceExprSyntax(baseName: variableDeclIdentifier)
+                return LabeledExprSyntax(
+                    label: variableDeclIdentifier,
+                    colon: .colonToken(),
+                    expression: SubscriptCallExprSyntax(
+                        calledExpression: calledExpr,
+                        arguments: LabeledExprListSyntax {
+                            LabeledExprSyntax(expression: index)
+                        }
+                    )
+                )
+            }
+        }
+        let expr = FunctionCallExprSyntax(
+            calledExpression: DeclReferenceExprSyntax(baseName: .identifier(structDecl.name.text)),
+            leftParen: .leftParenToken(),
+            arguments: arguments,
+            rightParen: .rightParenToken()
+        )
+        return AccessorDeclSyntax(accessorSpecifier: .keyword(.get)) {
+            CodeBlockItemSyntax(item: .expr(ExprSyntax(expr)))
+        }
+    }
+
+    private static func generateSubscriptSetAccessor(
+        for structDecl: StructDeclSyntax,
+        variableDecls: some Sequence<VariableDeclSyntax>
+    ) -> AccessorDeclSyntax {
+        let setValueIdentifier = TokenSyntax.identifier(structDecl.name.text.lowercased())
+        let parameter = AccessorParametersSyntax(name: setValueIdentifier)
+        let index = DeclReferenceExprSyntax(baseName: .identifier("index"))
+        return AccessorDeclSyntax(accessorSpecifier: .keyword(.set), parameters: parameter) {
+            variableDecls.map { variableDecl in
+                let variableDeclIdentifier = TokenSyntax.identifier(variableDecl.nameIdentifier)
+                let calledExpr = DeclReferenceExprSyntax(baseName: variableDeclIdentifier)
+                let subscriptCallExpr = SubscriptCallExprSyntax(
+                    calledExpression: calledExpr,
+                    arguments: LabeledExprListSyntax {
+                        LabeledExprSyntax(expression: index)
+                    }
+                )
+                let memberAccessExpr = MemberAccessExprSyntax(
+                    base: DeclReferenceExprSyntax(baseName: setValueIdentifier),
+                    declName: DeclReferenceExprSyntax(baseName: variableDeclIdentifier)
+                )
+                let expr = InfixOperatorExprSyntax(
+                    leftOperand: subscriptCallExpr,
+                    operator: AssignmentExprSyntax(),
+                    rightOperand: memberAccessExpr
+                )
+                return CodeBlockItemSyntax(item: .expr(ExprSyntax(expr)))
+            }
+        }
     }
 }
