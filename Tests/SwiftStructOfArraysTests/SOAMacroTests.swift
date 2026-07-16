@@ -50,6 +50,10 @@ final class SOAMacroTests: XCTestCase {
                 var startIndex: Int {
                     0
                 }
+
+                var endIndex: Int {
+                    health.count
+                }
             }
             """,
             macros: testMacros
@@ -95,6 +99,10 @@ final class SOAMacroTests: XCTestCase {
                 var startIndex: Int {
                     0
                 }
+
+                var endIndex: Int {
+                    health.count
+                }
             }
             """,
             macros: testMacros
@@ -138,6 +146,10 @@ final class SOAMacroTests: XCTestCase {
 
                 var startIndex: Int {
                     0
+                }
+
+                var endIndex: Int {
+                    health.count
                 }
             }
             """,
@@ -206,6 +218,10 @@ final class SOAMacroTests: XCTestCase {
 
                 var startIndex: Int {
                     0
+                }
+
+                var endIndex: Int {
+                    kind.count
                 }
             }
             """,

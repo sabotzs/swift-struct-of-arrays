@@ -2,11 +2,14 @@ import SwiftDiagnostics
 
 enum SOAError: Error, DiagnosticMessage {
     case notStruct
+    case noMemberVariables
 
     var message: String {
         switch self {
         case .notStruct:
             "SOA macros can be only applied to structs."
+        case .noMemberVariables:
+            "SOA macros can be only applied to structs with at least one member variable."
         }
     }
 
@@ -16,7 +19,7 @@ enum SOAError: Error, DiagnosticMessage {
 
     var severity: DiagnosticSeverity {
         switch self {
-        case .notStruct:
+        case .notStruct, .noMemberVariables:
             .error
         }
     }

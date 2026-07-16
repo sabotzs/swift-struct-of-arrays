@@ -30,10 +30,12 @@ public struct SOAMacro: PeerMacro {
             .filter { !($0.isStatic || $0.isAccessor) }
             .map { $0.toFullType(baseTypeId: structDecl.name.text, nestedTypeIds: nestedTypeIdentifiers) }
 
-        let soaStructDecl = StructDeclSyntax(name: .identifier("\(structDecl.name.text)SOA")) {
+        let soaStructDecl = try StructDeclSyntax.initWithTypedThrow(
+            name: .identifier("\(structDecl.name.text)SOA")
+        ) { () throws(SOAError) -> MemberBlockItemListSyntax in
             variableDecls.map { $0.toArrayType() }
             generateInitDecls(for: structDecl, variableDecls: variableDecls)
-            generateCollectionConformanceDecls(for: structDecl, variableDecls: variableDecls)
+            try generateCollectionConformanceDecls(for: structDecl, variableDecls: variableDecls)
         }
 
         return [DeclSyntax(soaStructDecl)]
@@ -167,9 +169,10 @@ public struct SOAMacro: PeerMacro {
     private static func generateCollectionConformanceDecls(
         for structDecl: StructDeclSyntax,
         variableDecls: some Sequence<VariableDeclSyntax>
-    ) -> [DeclSyntax] {
+    ) throws(SOAError) -> [DeclSyntax] {
         return [
             generateStartIndex(),
+            try generateEndIndex(variableDecls: variableDecls),
         ]
     }
 
@@ -184,6 +187,35 @@ public struct SOAMacro: PeerMacro {
         ) {
             PatternBindingSyntax(
                 pattern: IdentifierPatternSyntax(identifier: .identifier("startIndex")),
+                typeAnnotation: TypeAnnotationSyntax(type: TypeSyntax(IdentifierTypeSyntax(name: .identifier("Int")))),
+                accessorBlock: AccessorBlockSyntax(accessors: .getter(codeBlock))
+            )
+        }
+
+        return DeclSyntax(decl)
+    }
+
+    private static func generateEndIndex(
+        variableDecls: some Sequence<VariableDeclSyntax>
+    ) throws(SOAError) -> DeclSyntax {
+        guard let variableDecl = variableDecls.first(where: { _ in true }) else {
+            throw .noMemberVariables
+        }
+
+        let codeBlock = CodeBlockItemListSyntax {
+            let expr = MemberAccessExprSyntax(
+                base: DeclReferenceExprSyntax(baseName: .identifier(variableDecl.nameIdentifier)),
+                declName: DeclReferenceExprSyntax(baseName: .identifier("count"))
+            )
+            CodeBlockItemSyntax(item: .expr(ExprSyntax(expr)))
+        }
+
+        let decl = VariableDeclSyntax(
+            leadingTrivia: .newlines(2),
+            bindingSpecifier: .keyword(.var)
+        ) {
+            PatternBindingSyntax(
+                pattern: IdentifierPatternSyntax(identifier: .identifier("endIndex")),
                 typeAnnotation: TypeAnnotationSyntax(type: TypeSyntax(IdentifierTypeSyntax(name: .identifier("Int")))),
                 accessorBlock: AccessorBlockSyntax(accessors: .getter(codeBlock))
             )
