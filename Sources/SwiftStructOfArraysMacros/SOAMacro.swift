@@ -42,6 +42,7 @@ public struct SOAMacro: PeerMacro {
             variableDecls.map { $0.toArrayType() }
             generateInitDecls(for: structDecl, variableDecls: variableDecls)
             try generateCollectionConformanceDecls(for: structDecl, variableDecls: variableDecls)
+            generateArrayMethods(for: structDecl, variableDecls: variableDecls)
         }
 
         return [DeclSyntax(soaStructDecl)]
@@ -340,5 +341,56 @@ public struct SOAMacro: PeerMacro {
                 return CodeBlockItemSyntax(item: .expr(ExprSyntax(expr)))
             }
         }
+    }
+
+    private static func generateArrayMethods(
+        for structDecl: StructDeclSyntax,
+        variableDecls: some Sequence<VariableDeclSyntax>
+    ) -> [DeclSyntax] {
+        return [
+            generateReserveCapacity(variableDecls: variableDecls)
+        ]
+    }
+
+    private static func generateReserveCapacity(
+        variableDecls: some Sequence<VariableDeclSyntax>
+    ) -> DeclSyntax {
+        let reserveCapacity = TokenSyntax.identifier("reserveCapacity")
+        let minimumCapacity = TokenSyntax.identifier("minimumCapacity")
+        let signature = FunctionSignatureSyntax(
+            parameterClause: FunctionParameterClauseSyntax {
+                FunctionParameterSyntax(
+                    firstName: .wildcardToken(),
+                    secondName: minimumCapacity,
+                    type: IdentifierTypeSyntax(name: .identifier("Int"))
+                )
+            }
+        )
+        let codeBlock = CodeBlockSyntax {
+            variableDecls.map { variableDecl in
+                let expr = FunctionCallExprSyntax(
+                    calledExpression: MemberAccessExprSyntax(
+                        base: DeclReferenceExprSyntax(baseName: .identifier(variableDecl.nameIdentifier)),
+                        declName: DeclReferenceExprSyntax(baseName: reserveCapacity)
+                    ),
+                    leftParen: .leftParenToken(),
+                    arguments: LabeledExprListSyntax {
+                        LabeledExprSyntax(expression: DeclReferenceExprSyntax(baseName: minimumCapacity))
+                    },
+                    rightParen: .rightParenToken()
+                )
+                return CodeBlockItemSyntax(item: .expr(ExprSyntax(expr)))
+            }
+        }
+        let decl = FunctionDeclSyntax(
+            leadingTrivia: .newlines(2),
+            modifiers: DeclModifierListSyntax {
+                DeclModifierSyntax(name: .keyword(.mutating))
+            },
+            name: reserveCapacity,
+            signature: signature,
+            body: codeBlock
+        )
+        return DeclSyntax(decl)
     }
 }

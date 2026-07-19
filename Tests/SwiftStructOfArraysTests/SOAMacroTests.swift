@@ -68,6 +68,11 @@ final class SOAMacroTests: XCTestCase {
                         isAlive[index] = monster.isAlive
                     }
                 }
+
+                mutating func reserveCapacity(_ minimumCapacity: Int) {
+                    health.reserveCapacity(minimumCapacity)
+                    isAlive.reserveCapacity(minimumCapacity)
+                }
             }
             """,
             macros: testMacros
@@ -131,6 +136,11 @@ final class SOAMacroTests: XCTestCase {
                         mana[index] = monster.mana
                     }
                 }
+
+                mutating func reserveCapacity(_ minimumCapacity: Int) {
+                    health.reserveCapacity(minimumCapacity)
+                    mana.reserveCapacity(minimumCapacity)
+                }
             }
             """,
             macros: testMacros
@@ -192,6 +202,11 @@ final class SOAMacroTests: XCTestCase {
                         health[index] = monster.health
                         isAlive[index] = monster.isAlive
                     }
+                }
+
+                mutating func reserveCapacity(_ minimumCapacity: Int) {
+                    health.reserveCapacity(minimumCapacity)
+                    isAlive.reserveCapacity(minimumCapacity)
                 }
             }
             """,
@@ -278,6 +293,11 @@ final class SOAMacroTests: XCTestCase {
                         kind[index] = monster.kind
                         longitude[index] = monster.longitude
                     }
+                }
+
+                mutating func reserveCapacity(_ minimumCapacity: Int) {
+                    kind.reserveCapacity(minimumCapacity)
+                    longitude.reserveCapacity(minimumCapacity)
                 }
             }
             """,
