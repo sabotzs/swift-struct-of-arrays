@@ -30,8 +30,14 @@ public struct SOAMacro: PeerMacro {
             .filter { !($0.isStatic || $0.isAccessor) }
             .map { $0.toFullType(baseTypeId: structDecl.name.text, nestedTypeIds: nestedTypeIdentifiers) }
 
+        let inheritanceClause = InheritanceClauseSyntax {
+                InheritedTypeSyntax(type: IdentifierTypeSyntax(name: .identifier("RandomAccessCollection")))
+                InheritedTypeSyntax(type: IdentifierTypeSyntax(name: .identifier("MutableCollection")))
+            }
+
         let soaStructDecl = try StructDeclSyntax.initWithTypedThrow(
-            name: .identifier("\(structDecl.name.text)SOA")
+            name: .identifier("\(structDecl.name.text)SOA"),
+            inheritanceClause: inheritanceClause
         ) { () throws(SOAError) -> MemberBlockItemListSyntax in
             variableDecls.map { $0.toArrayType() }
             generateInitDecls(for: structDecl, variableDecls: variableDecls)

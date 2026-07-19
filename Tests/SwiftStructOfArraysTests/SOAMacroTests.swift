@@ -29,7 +29,7 @@ final class SOAMacroTests: XCTestCase {
                 let isAlive: Bool
             }
 
-            struct MonsterSOA {
+            struct MonsterSOA: RandomAccessCollection, MutableCollection {
                 var health: [Int]
                 var isAlive: [Bool]
 
@@ -92,7 +92,7 @@ final class SOAMacroTests: XCTestCase {
                 var health, mana: Int
             }
 
-            struct MonsterSOA {
+            struct MonsterSOA: RandomAccessCollection, MutableCollection {
                 var health: [Int]
                 var mana: [Int]
 
@@ -154,7 +154,7 @@ final class SOAMacroTests: XCTestCase {
                 var health: Int, isAlive: Bool
             }
 
-            struct MonsterSOA {
+            struct MonsterSOA: RandomAccessCollection, MutableCollection {
                 var health: [Int]
                 var isAlive: [Bool]
 
@@ -240,7 +240,7 @@ final class SOAMacroTests: XCTestCase {
                 }
             }
 
-            struct MonsterSOA {
+            struct MonsterSOA: RandomAccessCollection, MutableCollection {
                 var kind: [Monster.Kind]
                 var longitude: [Monster.Position.Longitude]
 
