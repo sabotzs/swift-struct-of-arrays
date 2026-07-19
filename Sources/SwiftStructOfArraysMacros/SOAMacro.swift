@@ -26,8 +26,8 @@ public struct SOAMacro: PeerMacro {
             .map { $0.typeIdentifier }
 
         let variableDecls = structDecl.getVariableDecls().lazy
-            .flatMap { $0.toFlatBindings() }
             .filter { !($0.isStatic || $0.isAccessor) }
+            .flatMap { $0.toFlatBindings() }
             .map { $0.toFullType(baseTypeId: structDecl.name.text, nestedTypeIds: nestedTypeIdentifiers) }
 
         let inheritanceClause = InheritanceClauseSyntax {

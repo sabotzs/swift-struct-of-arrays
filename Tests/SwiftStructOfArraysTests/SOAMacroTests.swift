@@ -95,11 +95,19 @@ final class SOAMacroTests: XCTestCase {
             @SOA
             struct Monster {
                 var health, mana: Int
+
+                var isAlive: Bool {
+                    health > 0
+                }
             }
             """,
             expandedSource: """
             struct Monster {
                 var health, mana: Int
+
+                var isAlive: Bool {
+                    health > 0
+                }
             }
 
             struct MonsterSOA: RandomAccessCollection, MutableCollection {

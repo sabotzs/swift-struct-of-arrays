@@ -89,7 +89,7 @@ extension VariableDeclSyntax {
 
     var isAccessor: Bool {
         guard bindings.count == 1 else {
-            fatalError("Expected VariableDeclSyntax with single variable.")
+            return false
         }
 
         return bindings.first!.accessorBlock != nil
