@@ -348,7 +348,8 @@ public struct SOAMacro: PeerMacro {
         variableDecls: some Sequence<VariableDeclSyntax>
     ) -> [DeclSyntax] {
         return [
-            generateReserveCapacity(variableDecls: variableDecls)
+            generateReserveCapacity(variableDecls: variableDecls),
+            generateAppend(for: structDecl, variableDecls: variableDecls),
         ]
     }
 
@@ -390,6 +391,53 @@ public struct SOAMacro: PeerMacro {
             name: reserveCapacity,
             signature: signature,
             body: codeBlock
+        )
+        return DeclSyntax(decl)
+    }
+
+    private static func generateAppend(
+        for structDecl: StructDeclSyntax,
+        variableDecls: some Sequence<VariableDeclSyntax>
+    ) -> DeclSyntax {
+        let structDeclInstance = TokenSyntax.identifier(structDecl.name.text.lowercased())
+        let append = TokenSyntax.identifier("append")
+        let decl = FunctionDeclSyntax(
+            leadingTrivia: .newlines(2),
+            modifiers: DeclModifierListSyntax {
+                DeclModifierSyntax(name: .keyword(.mutating))
+            },
+            name: append,
+            signature: FunctionSignatureSyntax(
+                parameterClause: FunctionParameterClauseSyntax {
+                    FunctionParameterSyntax(
+                        firstName: .wildcardToken(),
+                        secondName: structDeclInstance,
+                        type: IdentifierTypeSyntax(name: .identifier(structDecl.name.text))
+                    )
+                },
+            ),
+            body: CodeBlockSyntax {
+                variableDecls.map { variableDecl in
+                    let variableDeclName = TokenSyntax.identifier(variableDecl.nameIdentifier)
+                    let expr = FunctionCallExprSyntax(
+                        calledExpression: MemberAccessExprSyntax(
+                            base: DeclReferenceExprSyntax(baseName: variableDeclName),
+                            declName: DeclReferenceExprSyntax(baseName: append)
+                        ),
+                        leftParen: .leftParenToken(),
+                        arguments: LabeledExprListSyntax {
+                            LabeledExprSyntax(
+                                expression: MemberAccessExprSyntax(
+                                    base: DeclReferenceExprSyntax(baseName: structDeclInstance),
+                                    declName: DeclReferenceExprSyntax(baseName: variableDeclName)
+                                )
+                            )
+                        },
+                        rightParen: .rightParenToken()
+                    )
+                    return CodeBlockItemSyntax(item: .expr(ExprSyntax(expr)))
+                }
+            },
         )
         return DeclSyntax(decl)
     }

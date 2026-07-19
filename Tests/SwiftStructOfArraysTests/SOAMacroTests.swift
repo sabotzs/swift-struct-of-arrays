@@ -73,6 +73,11 @@ final class SOAMacroTests: XCTestCase {
                     health.reserveCapacity(minimumCapacity)
                     isAlive.reserveCapacity(minimumCapacity)
                 }
+
+                mutating func append(_ monster: Monster) {
+                    health.append(monster.health)
+                    isAlive.append(monster.isAlive)
+                }
             }
             """,
             macros: testMacros
@@ -141,6 +146,11 @@ final class SOAMacroTests: XCTestCase {
                     health.reserveCapacity(minimumCapacity)
                     mana.reserveCapacity(minimumCapacity)
                 }
+
+                mutating func append(_ monster: Monster) {
+                    health.append(monster.health)
+                    mana.append(monster.mana)
+                }
             }
             """,
             macros: testMacros
@@ -207,6 +217,11 @@ final class SOAMacroTests: XCTestCase {
                 mutating func reserveCapacity(_ minimumCapacity: Int) {
                     health.reserveCapacity(minimumCapacity)
                     isAlive.reserveCapacity(minimumCapacity)
+                }
+
+                mutating func append(_ monster: Monster) {
+                    health.append(monster.health)
+                    isAlive.append(monster.isAlive)
                 }
             }
             """,
@@ -298,6 +313,11 @@ final class SOAMacroTests: XCTestCase {
                 mutating func reserveCapacity(_ minimumCapacity: Int) {
                     kind.reserveCapacity(minimumCapacity)
                     longitude.reserveCapacity(minimumCapacity)
+                }
+
+                mutating func append(_ monster: Monster) {
+                    kind.append(monster.kind)
+                    longitude.append(monster.longitude)
                 }
             }
             """,
